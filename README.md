@@ -1,6 +1,8 @@
 # Deps check
 
-Run a set of tests or checks to see if commands run successfully or files exist
+Run a set of tests or checks to see if commands run successfully or files exist.
+
+This project requires only Python 3.6 or later no other dependencies are required.
 
 ## Usage
 
