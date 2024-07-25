@@ -14,6 +14,7 @@ from deps_check import characters
 VERSION = "0.1"
 silent = False
 
+
 def parse_file(file_name):
     targets = {}
     rules = {}
@@ -42,10 +43,11 @@ def parse_file(file_name):
                 continue
             if line[4:].startswith("#"):
                 continue
-            rules[rule_name].append(line.replace("\n","")[4:])
+            rules[rule_name].append(line.replace("\n", "")[4:])
 
             continue
     return targets, rules
+
 
 def run_command(command):
     try:
@@ -54,36 +56,76 @@ def run_command(command):
     except subprocess.CalledProcessError as e:
         return e.returncode, e.output
 
+
 def print_fail_report(report):
     for i in range(len(report["Rules_ran"])):
         if "FAIL" in report["Status"][i]:
-            print(colors.RED + characters.CROSS + " " + report["Rules_ran"][i] + colors.RESET)
+            print(
+                colors.RED
+                + characters.CROSS
+                + " "
+                + report["Rules_ran"][i]
+                + colors.RESET
+            )
             for j in range(len(report["Reports"][i]["Commands_ran"])):
                 if "FAIL" in report["Reports"][i]["Status"][j]:
-                    print("    " + colors.RED + characters.CROSS + " " + report["Reports"][i]["Commands_ran"][j] + colors.RESET)
+                    print(
+                        "    "
+                        + colors.RED
+                        + characters.CROSS
+                        + " "
+                        + report["Reports"][i]["Commands_ran"][j]
+                        + colors.RESET
+                    )
                     if report["Reports"][i]["Command_type"][j] == "Command":
-                        print("        Command returned: " + str(report["Reports"][i]["Exit_code"][j]))
+                        print(
+                            "        Command returned: "
+                            + str(report["Reports"][i]["Exit_code"][j])
+                        )
                     if report["Reports"][i]["Command_type"][j] == "Not Command":
-                        print("        Command returned 0 exit code but expected a non-zero exit code")
-                    print("        "+ str(report["Reports"][i]["Output"][j]))
+                        print(
+                            "        Command returned 0 exit code but expected a non-zero exit code"
+                        )
+                    print("        " + str(report["Reports"][i]["Output"][j]))
+
 
 def print_fail():
     if not silent:
-        print("["+colors.RED + characters.CROSS + colors.RESET + "]"+ colors.RED + " FAIL" + colors.RESET)
+        print(
+            "["
+            + colors.RED
+            + characters.CROSS
+            + colors.RESET
+            + "]"
+            + colors.RED
+            + " FAIL"
+            + colors.RESET
+        )
+
 
 def print_pass():
     if not silent:
-        print("["+colors.GREEN + characters.TICK + colors.RESET + "]"+ colors.GREEN + " PASS" + colors.RESET)
+        print(
+            "["
+            + colors.GREEN
+            + characters.TICK
+            + colors.RESET
+            + "]"
+            + colors.GREEN
+            + " PASS"
+            + colors.RESET
+        )
 
-def run_target(rules,targets,target):
-    reports = { 
+
+def run_target(rules, targets, target):
+    reports = {
         "Rules_ran": [],
         "Reports": [],
         "Status": [],
     }
     for rule in targets[target]:
         print("==== Running Rule: " + rule + " ====")
-        report = run_rule(rules,targets,rule)
+        report = run_rule(rules, targets, rule)
         reports["Rules_ran"].append(rule)
         reports["Reports"].append(report)
         if "FAIL" in report["Status"]:
@@ -92,13 +134,14 @@ def run_target(rules,targets,target):
             reports["Status"].append("PASS")
     print_fail_report(reports)
 
-def run_rule(rules,targets,rule_to_run):
+
+def run_rule(rules, targets, rule_to_run):
     report = {
         "Commands_ran": [],
         "Status": [],
         "Output": [],
         "Exit_code": [],
-        "Command_type": []
+        "Command_type": [],
     }
 
     for rule in rules[rule_to_run]:
@@ -167,16 +210,17 @@ def run_rule(rules,targets,rule_to_run):
                 continue
     return report
 
+
 def main():
     file = "deps.txt"
     for i in range(len(sys.argv)):
         if sys.argv[i] == "-f" or sys.argv[i] == "--file":
-            file = sys.argv[i+1]
+            file = sys.argv[i + 1]
         if sys.argv[i] == "-h" or sys.argv[i] == "--help":
             print("deps_check -f <file>")
             sys.exit(0)
     targets, rules = parse_file(file)
-    run_target(rules,targets,"all")
+    run_target(rules, targets, "all")
 
 
 if __name__ == "__main__":
